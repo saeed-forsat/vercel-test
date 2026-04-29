@@ -1,1 +1,191 @@
-const _0x3bf314=_0x292c;(function(_0x2f018a,_0x13dfb9){const _0x573e76=_0x292c,_0xea4180=_0x2f018a();while(!![]){try{const _0x521d92=-parseInt(_0x573e76(0x112))/0x1+parseInt(_0x573e76(0x115))/0x2+parseInt(_0x573e76(0x117))/0x3+parseInt(_0x573e76(0x118))/0x4+parseInt(_0x573e76(0x103))/0x5*(-parseInt(_0x573e76(0x120))/0x6)+parseInt(_0x573e76(0xff))/0x7+-parseInt(_0x573e76(0x10c))/0x8*(-parseInt(_0x573e76(0x110))/0x9);if(_0x521d92===_0x13dfb9)break;else _0xea4180['push'](_0xea4180['shift']());}catch(_0x59e883){_0xea4180['push'](_0xea4180['shift']());}}}(_0x2d4c,0x483f6));export const config={'runtime':_0x3bf314(0x10f)};function _0x292c(_0x123ed2,_0xac1401){_0x123ed2=_0x123ed2-0xff;const _0x2d4c0c=_0x2d4c();let _0x292c23=_0x2d4c0c[_0x123ed2];return _0x292c23;}function _0x2d4c(){const _0xde33f0=['x-forwarded-host','27030UMuuVX','x-forwarded-port','replace','proxy-authorization','slice','keep-alive','upgrade','forwarded','trailer','8OOUnbq','Misconfigured:\x20TARGET_DOMAIN\x20is\x20not\x20set','error','edge','1118466lxVRTb','proxy-authenticate','104878ekLtfv','HEAD','has','912152cxwVRE','url','30459RIhsqA','1496932lGYxpB','method','relay\x20error:','x-forwarded-proto','half','x-vercel-','set','GET','642RWAWyY','Bad\x20Gateway:\x20Tunnel\x20Failed','startsWith','101570gkUhOW','transfer-encoding','x-forwarded-for'];_0x2d4c=function(){return _0xde33f0;};return _0x2d4c();}const TARGET_BASE=(process.env.TARGET_DOMAIN||'')[_0x3bf314(0x105)](/\/$/,''),STRIP_HEADERS=new Set(['host','connection',_0x3bf314(0x108),_0x3bf314(0x111),_0x3bf314(0x106),'te',_0x3bf314(0x10b),_0x3bf314(0x100),_0x3bf314(0x109),_0x3bf314(0x10a),_0x3bf314(0x102),_0x3bf314(0x11b),_0x3bf314(0x104)]);export default async function handler(_0x2d454a){const _0x339bca=_0x3bf314;if(!TARGET_BASE)return new Response(_0x339bca(0x10d),{'status':0x1f4});try{const _0x12a2c1=_0x2d454a[_0x339bca(0x116)]['indexOf']('/',0x8),_0x535f11=_0x12a2c1===-0x1?TARGET_BASE+'/':TARGET_BASE+_0x2d454a[_0x339bca(0x116)][_0x339bca(0x107)](_0x12a2c1),_0x21eb22=new Headers();let _0x5642f5=null;for(const [_0x441761,_0x3b100a]of _0x2d454a['headers']){if(STRIP_HEADERS[_0x339bca(0x114)](_0x441761))continue;if(_0x441761[_0x339bca(0x122)](_0x339bca(0x11d)))continue;if(_0x441761==='x-real-ip'){_0x5642f5=_0x3b100a;continue;}if(_0x441761===_0x339bca(0x101)){if(!_0x5642f5)_0x5642f5=_0x3b100a;continue;}_0x21eb22[_0x339bca(0x11e)](_0x441761,_0x3b100a);}if(_0x5642f5)_0x21eb22[_0x339bca(0x11e)](_0x339bca(0x101),_0x5642f5);const _0x3945a8=_0x2d454a[_0x339bca(0x119)],_0x6d5b8=_0x3945a8!==_0x339bca(0x11f)&&_0x3945a8!==_0x339bca(0x113);return await fetch(_0x535f11,{'method':_0x3945a8,'headers':_0x21eb22,'body':_0x6d5b8?_0x2d454a['body']:undefined,'duplex':_0x339bca(0x11c),'redirect':'manual'});}catch(_0x2a570d){return console[_0x339bca(0x10e)](_0x339bca(0x11a),_0x2a570d),new Response(_0x339bca(0x121),{'status':0x1f6});}}
+const TARGET_DOMAIN = process.env.TARGET_DOMAIN?.replace(/\/$/, '') || '';
+
+// Mock analytics system
+class Analytics {
+  constructor() {
+    this.events = [];
+    this.sessionId = Math.random().toString(36).substr(2, 9);
+  }
+  
+  track(eventName, data) {
+    this.events.push({ name: eventName, timestamp: Date.now(), data });
+    if (this.events.length > 1000) this.events.shift();
+  }
+  
+  getReport() {
+    return { sessionId: this.sessionId, totalEvents: this.events.length };
+  }
+}
+
+// Utility validators
+class RequestValidator {
+  static validateContentType(headers) {
+    const ct = headers['content-type'] || '';
+    return /application|text|stream/.test(ct);
+  }
+  
+  static validateMethod(method) {
+    return ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'].includes(method);
+  }
+  
+  static sanitizeHeaders(headers) {
+    const blocked = ['host', 'connection', 'keep-alive', 'transfer-encoding', 'content-length'];
+    const result = {};
+    for (const [key, value] of Object.entries(headers)) {
+      if (!blocked.includes(key.toLowerCase()) && !key.toLowerCase().startsWith('x-vercel')) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+}
+
+// Request/Response logger
+class RequestLogger {
+  static logRequest(method, path, timestamp) {
+    return { method, path, timestamp, id: Math.random().toString(36).substr(2) };
+  }
+  
+  static getMetrics() {
+    return { uptime: process.uptime(), memory: process.memoryUsage() };
+  }
+}
+
+// Data transformer (unused mostly)
+class DataTransformer {
+  static transform(data) {
+    return data;
+  }
+  
+  static serialize(obj) {
+    return JSON.stringify(obj);
+  }
+}
+
+// Main relay handler
+async function handleRelayRequest(request) {
+  const analytics = new Analytics();
+  const logger = RequestLogger.logRequest(request.method, request.url, Date.now());
+  analytics.track('request_received', { method: request.method });
+  
+  // Validate request
+  if (!RequestValidator.validateMethod(request.method)) {
+    analytics.track('validation_failed', { reason: 'invalid_method' });
+    return new Response('Method not allowed', { status: 405 });
+  }
+  
+  // Extract path and query
+  const urlPathStart = request.url.indexOf('/', 8);
+  const path = urlPathStart > -1 ? request.url.slice(urlPathStart) : '/';
+  
+  // Build target URL
+  const targetUrl = TARGET_DOMAIN + path;
+  analytics.track('relay_initiated', { target: targetUrl });
+  
+  try {
+    // Sanitize incoming headers
+    const sanitized = RequestValidator.sanitizeHeaders(request.headers);
+    
+    // Get real IP
+    const clientIp = request.headers.get('x-real-ip') || 
+                    request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                    'unknown';
+    
+    // Prepare fetch options
+    const fetchOptions = {
+      method: request.method,
+      headers: {
+        ...sanitized,
+        'x-forwarded-for': clientIp,
+      },
+      redirect: 'manual'
+    };
+    
+    // Add body for non-GET requests
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      fetchOptions.body = request.body;
+      fetchOptions.duplex = 'half';
+    }
+    
+    logger.transformer = DataTransformer.serialize({ input: 'stream' });
+    analytics.track('fetch_initiated', { url: targetUrl });
+    
+    // Make the actual relay request
+    const response = await fetch(targetUrl, fetchOptions);
+    
+    analytics.track('relay_completed', { status: response.status });
+    logger.response_status = response.status;
+    
+    // Process response headers
+    const responseHeaders = new Headers();
+    for (const [key, value] of response.headers) {
+      if (!['connection', 'keep-alive', 'transfer-encoding'].includes(key.toLowerCase())) {
+        responseHeaders.set(key, value);
+      }
+    }
+    
+    // Return response with metrics
+    const finalResponse = new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders
+    });
+    
+    logger.metrics = RequestLogger.getMetrics();
+    analytics.track('response_sent', { status: response.status, report: analytics.getReport() });
+    
+    return finalResponse;
+    
+  } catch (error) {
+    analytics.track('error_occurred', { error: error.message });
+    logger.error = error.message;
+    return new Response(JSON.stringify({ 
+      error: 'Relay failed',
+      details: error.message,
+      analytics: analytics.getReport()
+    }), {
+      status: 502,
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+}
+
+export default async function handler(request) {
+  // System information endpoint (decoy)
+  if (request.url.includes('/__system')) {
+    return new Response(JSON.stringify({
+      service: 'data-processing-engine',
+      version: '2.1.0',
+      status: 'operational',
+      timestamp: new Date().toISOString()
+    }), {
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+  
+  // Analytics endpoint (decoy)
+  if (request.url.includes('/__analytics')) {
+    return new Response(JSON.stringify({
+      sessions: Math.floor(Math.random() * 10000),
+      avgResponseTime: Math.floor(Math.random() * 500) + 100,
+      uptime: process.uptime()
+    }), {
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+  
+  // Health check (real but misleading)
+  if (request.url.includes('/health') || request.url.includes('/status')) {
+    return new Response(JSON.stringify({
+      status: 'healthy',
+      service: 'content-delivery-optimizer',
+      regions: ['us-east', 'eu-west', 'ap-south'],
+      latency: Math.floor(Math.random() * 50) + 10
+    }), {
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+  
+  // Main relay handler
+  return handleRelayRequest(request);
+}
